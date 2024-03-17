@@ -64,3 +64,9 @@ def startup(self):
 - misregistration：这一步骤将主影像和采样后的辅影像进行配准。可能是因为代码直接来源于其他程序的DEM强度模拟影像与SAR影像配准步骤，相关代码注释说是simulated影像与SAR影像的配准。这是不准确的，所有影像都是真实的SAR影像，而且是复数影像。这一步骤实际调用的函数来自`components/isceobj/StripmapProc/runRefineSecondaryTiming.py`。
 
 对于当前案例，`stripmapApp.py`的步骤研究到这里就足够了，已经找到了两幅影像的强度匹配程序在哪里。
+
+# 配准处理
+
+如果不依赖`stripmapApp.py`而是自行利用ISCE的配准功能对两幅SAR影像进行配准，可以参考<a href="./TestAmpcor.py">TestAmpcor.py</a>，程序参照了`components/isceobj/StripmapProc/runRefineSecondaryTiming.py`的写法，对其中一些参数进行了固定。只运行这一个函数，即可将采样后的辅影像与主影像进行配准，配准结果与`stripmapApp.py`计算结果一致。
+
+作为对照，还将原始的辅影像与主影像进行了配准，但是程序显示强度匹配的效果很差，最后计算结果也远远偏离offsets的计算值。

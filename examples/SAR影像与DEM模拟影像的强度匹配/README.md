@@ -73,6 +73,8 @@ def startup(self):
 
 尽管有些地方提到，还有一种配准方法叫做NStage，但它其实只是不同尺度Ampcor方法的组合，可以参考<a href="./TestNStage.py">TestNStage.py</a>中的参数设置方法。<a href="./TestDenseOffsets.py">TestDenseOffsets.py</a>对应`stripmapApp.py`标准流程中misregistration步骤后的dense_offsets步骤，在本项目中是用不到的。
 
+此外，本项目可能还要参考`components/isceobj/InsarProc/runRgoffset_ampcor.py`。
+
 # DEM模拟强度影像
 
 由于`stripmapApp.py`流程中不涉及DEM模拟强度影像，因此必须自己寻找相关的模块。所幸这个模块很显眼，用法也很简单。模块位于`components/isceobj/Util/Simamplitude.py`，具体用法见<a href="./TestSimAmp.py">TestSimAmp.py</a>。

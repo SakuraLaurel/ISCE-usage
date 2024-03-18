@@ -67,6 +67,12 @@ def startup(self):
 
 # 配准处理
 
-如果不依赖`stripmapApp.py`而是自行利用ISCE的配准功能对两幅SAR影像进行配准，可以参考<a href="./TestAmpcor.py">TestAmpcor.py</a>，程序参照了`components/isceobj/StripmapProc/runRefineSecondaryTiming.py`的写法，对其中一些参数进行了固定。只运行这一个函数，即可将采样后的辅影像与主影像进行配准，配准结果与`stripmapApp.py`的misregistration步骤计算结果一致。尽管有些地方提到，还有一种配准方法叫做NStage，但它其实只是不同尺度Ampcor方法的组合，可以参考<a href="./TestNStage.py">TestNStage.py</a>中的参数设置方法。<a href="./TestDenseOffsets.py">TestDenseOffsets.py</a>对应`stripmapApp.py`标准流程中misregistration步骤后的dense_offsets步骤，在本项目中是用不到的。
+如果不依赖`stripmapApp.py`而是自行利用ISCE的配准功能对两幅SAR影像进行配准，可以参考<a href="./TestAmpcor.py">TestAmpcor.py</a>，程序参照了`components/isceobj/StripmapProc/runRefineSecondaryTiming.py`的写法，对其中一些参数进行了固定。只运行这一个函数，即可将辅影像与主影像进行配准，配准结果与`stripmapApp.py`的misregistration步骤计算结果一致。
 
-Ampcor库的参数设置可以参考<a href="./Unofficial_ISCE_Guide.pdf">Unofficial_ISCE_Guide.pdf</a>
+如果将原始的辅影像与主影像配准，根据ISCE的计算结果，辅影像与主影像在方位向的offset约为27像素，在距离向的offset约为156像素，而Ampcor的距离向搜索窗口大小只有40，因此必须设置一个150左右的距离向offset初始值。如果将采样后的辅影像与主影像配准，那么因为两方向的offset都小于0，所以不用设置offset初始值。
+
+尽管有些地方提到，还有一种配准方法叫做NStage，但它其实只是不同尺度Ampcor方法的组合，可以参考<a href="./TestNStage.py">TestNStage.py</a>中的参数设置方法。<a href="./TestDenseOffsets.py">TestDenseOffsets.py</a>对应`stripmapApp.py`标准流程中misregistration步骤后的dense_offsets步骤，在本项目中是用不到的。
+
+# DEM模拟强度影像
+
+由于`stripmapApp.py`流程中不涉及DEM模拟强度影像，因此必须自己寻找相关的模块。所幸这个模块很显眼，用法也很简单。模块位于`components/isceobj/Util/Simamplitude.py`，具体用法见<a href="./TestSimAmp.py">TestSimAmp.py</a>。

@@ -67,6 +67,6 @@ def startup(self):
 
 # 配准处理
 
-如果不依赖`stripmapApp.py`而是自行利用ISCE的配准功能对两幅SAR影像进行配准，可以参考<a href="./TestAmpcor.py">TestAmpcor.py</a>，程序参照了`components/isceobj/StripmapProc/runRefineSecondaryTiming.py`的写法，对其中一些参数进行了固定。只运行这一个函数，即可将采样后的辅影像与主影像进行配准，配准结果与`stripmapApp.py`计算结果一致。
+如果不依赖`stripmapApp.py`而是自行利用ISCE的配准功能对两幅SAR影像进行配准，可以参考<a href="./TestAmpcor.py">TestAmpcor.py</a>，程序参照了`components/isceobj/StripmapProc/runRefineSecondaryTiming.py`的写法，对其中一些参数进行了固定。只运行这一个函数，即可将采样后的辅影像与主影像进行配准，配准结果与`stripmapApp.py`的misregistration步骤计算结果一致。尽管有些地方提到，还有一种配准方法叫做NStage，但它其实只是不同尺度Ampcor方法的组合，可以参考<a href="./TestNStage.py">TestNStage.py</a>中的参数设置方法。<a href="./TestDenseOffsets.py">TestDenseOffsets.py</a>对应`stripmapApp.py`标准流程中misregistration步骤后的dense_offsets步骤，在本项目中是用不到的。
 
-作为对照，还将原始的辅影像与主影像进行了配准，但是程序显示强度匹配的效果很差，最后计算结果也远远偏离offsets的计算值。
+Ampcor库的参数设置可以参考<a href="./Unofficial_ISCE_Guide.pdf">Unofficial_ISCE_Guide.pdf</a>

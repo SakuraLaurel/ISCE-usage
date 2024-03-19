@@ -1,4 +1,3 @@
-
 from isce.components.iscesys.StdOEL.StdOELPy import create_writer
 from isce.components.isceobj.Image.SlcImage import SlcImage
 from isce.components.mroipac.ampcor.Ampcor import Ampcor
@@ -12,12 +11,21 @@ def stripmapApp():
     status = insar.run()
     raise SystemExit(status)
 
-def main(test=False,azrgOrder=0,azazOrder=0, rgrgOrder=0,rgazOrder=0,snr=5.0):
+def main(test=False,windowSize=256,searchSize=16):
     sim_path = "test/sim.rdr"
-    referenceSlc = "reference_slc/reference.slc"
     azoffset, rgoffset = 0, 0
+    sim_type = "real"
     if test:
-        sim_path = "test/sim.rdr"
+        sim_path = "secondary_slc/secondary.slc"
+        azoffset, rgoffset = -27, 156
+        sim_type = "mag"
+    referenceSlc = "reference_slc/reference.slc"
+    nAcross = 60
+    nDown = 60
+    azrgOrder=0
+    azazOrder=0
+    rgrgOrder=0
+    rgazOrder=0
 
     sim = Image()
     sim.load(sim_path + '.xml')
@@ -29,50 +37,33 @@ def main(test=False,azrgOrder=0,azazOrder=0, rgrgOrder=0,rgazOrder=0,snr=5.0):
     sar.setAccessMode('READ')
     sar.createImage()
 
-    width = sar.getWidth()
-    length = sar.getLength()
-
-    objOffset = Ampcor(name='reference_offset1')
+    objOffset = Ampcor(name='')
     objOffset.configure()
     objOffset.setAcrossGrossOffset(rgoffset)
     objOffset.setDownGrossOffset(azoffset)
-    objOffset.setWindowSizeWidth(128)
-    objOffset.setWindowSizeHeight(128)
-    objOffset.setSearchWindowSizeWidth(40)
-    objOffset.setSearchWindowSizeHeight(40)
+    objOffset.setWindowSizeWidth(windowSize)
+    objOffset.setWindowSizeHeight(windowSize)
+    objOffset.setSearchWindowSizeWidth(searchSize)
+    objOffset.setSearchWindowSizeHeight(searchSize)
     margin = 2*objOffset.searchWindowSizeWidth + objOffset.windowSizeWidth
 
-    nAcross = 60
-    nDown = 60
+    nearestDistance = 21
+    offAc = max(nearestDistance,-rgoffset)+margin
+    offDn = max(nearestDistance,-azoffset)+margin
 
-    offAc = max(101,-rgoffset)+margin
-    offDn = max(101,-azoffset)+margin
+    lastAc = int( min(sar.getWidth(), sim.getWidth() - offAc) - margin)
+    lastDn = int( min(sar.getLength(), sim.getLength() - offDn) - margin)
 
-    lastAc = int( min(width, sim.getWidth() - offAc) - margin)
-    lastDn = int( min(length, sim.getLength() - offDn) - margin)
-
-    if not objOffset.firstSampleAcross:
-        objOffset.setFirstSampleAcross(offAc)
-
-    if not objOffset.lastSampleAcross:
-        objOffset.setLastSampleAcross(lastAc)
-
-    if not objOffset.firstSampleDown:
-        objOffset.setFirstSampleDown(offDn)
-
-    if not objOffset.lastSampleDown:
-        objOffset.setLastSampleDown(lastDn)
-
-    if not objOffset.numberLocationAcross:
-        objOffset.setNumberLocationAcross(nAcross)
-
-    if not objOffset.numberLocationDown:
-        objOffset.setNumberLocationDown(nDown)
-
+    objOffset.setFirstSampleAcross(offAc)
+    objOffset.setLastSampleAcross(lastAc)
+    objOffset.setFirstSampleDown(offDn)
+    objOffset.setLastSampleDown(lastDn)
+    objOffset.setNumberLocationAcross(nAcross)
+    objOffset.setNumberLocationDown(nDown)
     objOffset.setFirstPRF(1.0)
     objOffset.setSecondPRF(1.0)
     objOffset.setImageDataType1('mag')
-    objOffset.setImageDataType2('real')
+    objOffset.setImageDataType2(sim_type)
 
     objOffset.ampcor(sar, sim)
 
@@ -80,30 +71,45 @@ def main(test=False,azrgOrder=0,azazOrder=0, rgrgOrder=0,rgazOrder=0,snr=5.0):
     sim.finalizeImage()
 
     field = objOffset.getOffsetField()
-    # for distance in [10,5,3,1]:
-    #     inpts = len(field._offsets)
-    #     print("DEBUG %%%%%%%%")
-    #     print(inpts)
-    #     print("DEBUG %%%%%%%%")
-    #     objOff = createOffoutliers()
-    #     objOff.wireInputPort(name='offsets', object=field)
-    #     objOff.setSNRThreshold(snr)
-    #     objOff.setDistance(distance)
-    #     objOff.setStdWriter(create_writer("","",False))
 
-    #     objOff.offoutliers()
-
-    #     field = objOff.getRefinedOffsetField()
-    #     outputs = len(field._offsets)
-
-    #     print('%d points left'%(len(field._offsets)))
-
-    aa, dummy = field.getFitPolynomials(azimuthOrder=azazOrder, rangeOrder=azrgOrder, usenumpy=True)
-    dummy, rr = field.getFitPolynomials(azimuthOrder=rgazOrder, rangeOrder=rgrgOrder, usenumpy=True)
+    aa, _ = field.getFitPolynomials(azimuthOrder=azazOrder, rangeOrder=azrgOrder, usenumpy=True)
+    _, rr = field.getFitPolynomials(azimuthOrder=rgazOrder, rangeOrder=rgrgOrder, usenumpy=True)
 
     azshift = aa._coeffs[0][0]
     rgshift = rr._coeffs[0][0]
     print('Estimated az shift: ', azshift)
     print('Estimated rg shift: ', rgshift)
 
-main()
+    import pickle
+    with open("test/field60.pkl", "wb") as f:
+        pickle.dump(field,f)
+
+
+def filt(field, snr=5):
+    for distance in [100,5,3,1]:
+        objOff = createOffoutliers()
+        objOff.wireInputPort(name='offsets', object=field)
+        objOff.setSNRThreshold(snr)
+        objOff.setDistance(distance)
+        objOff.setStdWriter(create_writer("log","",True,filename='off.log'))
+        objOff.offoutliers()
+        field = objOff.getRefinedOffsetField()
+        print('%d points left'%(len(field._offsets)))
+        break
+
+    aa, _ = field.getFitPolynomials(azimuthOrder=0, rangeOrder=0, usenumpy=True)
+    _, rr = field.getFitPolynomials(azimuthOrder=0, rangeOrder=0, usenumpy=True)
+
+    azshift = aa._coeffs[0][0]
+    rgshift = rr._coeffs[0][0]
+    print('Estimated az shift: ', azshift)
+    print('Estimated rg shift: ', rgshift)
+
+# main(True)
+# main(False)
+if __name__ == "__main__":
+    # main(False)
+    import pickle
+    with open("test/field.pkl","rb") as f:
+        field = pickle.load(f)
+        filt(field)

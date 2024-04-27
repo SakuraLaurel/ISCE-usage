@@ -105,6 +105,8 @@ def filt(field, snr=5):
     print('Estimated az shift: ', azshift)
     print('Estimated rg shift: ', rgshift)
 
+    # np.array(field.unpackOffsets())可以得到一个n x 5的数组，每一列依次是距离向采样位置、距离向偏移值、方位向采样位置、方位向偏移值、该次采样SNR。可以绘制出来，自己进行回归等操作。
+
 # main(True)
 # main(False)
 if __name__ == "__main__":

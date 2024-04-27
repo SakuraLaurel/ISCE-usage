@@ -63,10 +63,6 @@ def TestNStage():
             rgrgOrder=0,
             snr=5.0)
     odb['cull_field'] = cull
-
-
-
-
     odb['azpoly'] = shifts[0]
     odb['rgpoly'] = shifts[1]
     odb.close()     

@@ -1,0 +1,13 @@
+<stripmapApp>
+  <component name="stripmapApp">
+    <property name="sensor name">TERRASARX</property>
+    <component name="reference">
+      <property name="xml">data/TSX-1.SAR.L1B/TDX1_SAR__SSC______SM_S_SRA_20190117T100449_20190117T100457/TDX1_SAR__SSC______SM_S_SRA_20190117T100449_20190117T100457.xml</property>
+      <property name="OUTPUT">reference</property>
+    </component>
+    <component name="secondary">
+      <property name="xml">data/TSX-1.SAR.L1B/TDX1_SAR__SSC______SM_S_SRA_20190117T100449_20190117T100457/TDX1_SAR__SSC______SM_S_SRA_20190117T100449_20190117T100457.xml</property>
+      <property name="OUTPUT">secondary</property>
+    </component>
+  </component>
+</stripmapApp>

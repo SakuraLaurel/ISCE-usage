@@ -19,6 +19,36 @@ export ISCE_HOME=$ENV_PATH/lib/python3.11/site-packages/isce
 export PATH=$PATH:$ISCE_HOME/applications:$ISCE_HOME/bin
 ```
 
+如果在ubuntu上直接安装，需要安装以下依赖
+
+```
+gcc
+gfortran
+libfftw3-dev
+python3
+python3-pip
+cython3
+libopencv-dev
+libmotif-dev
+pybind11-dev
+libgdal-dev
+python3-gdal
+libhdf5-dev
+python-dev
+```
+
+随后
+
+```bash
+cmake .. -DCMAKE_INSTALL_PREFIX=/home/isce2 -DPYTHON_MODULE_DIR=/usr/local/lib/python3.10/dist-packages
+```
+
+我使用docker启动服务：
+
+```bash
+docker run -it -p 11451:22 -v ~/laurel:/home/data --name isce ubuntu:22.04
+```
+
 # ISCE基本结构
 
 进入到`$ISCE_HOME`路径下，可以看到applications、components等文件夹，其中最重要的就是上述这两个文件夹：

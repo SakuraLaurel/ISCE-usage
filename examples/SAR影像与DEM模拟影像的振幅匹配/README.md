@@ -81,4 +81,4 @@ def startup(self):
 
 尽管有些地方提到，还有一种配准方法叫做NStage，但它其实只是不同尺度Ampcor方法的组合，可以参考<a href="./TestNStage.py">TestNStage.py</a>中的参数设置方法。<a href="./TestDenseOffsets.py">TestDenseOffsets.py</a>对应`stripmapApp.py`标准流程中misregistration步骤后的dense_offsets步骤，在本项目中是用不到的。此外，本程序还参考了`components/isceobj/InsarProc/runRgoffset_ampcor.py`。
 
-实现了两景SAR影像配准后，再来看看如何配准SAR影像与DEM模拟振幅影像。<a href="./main.py">main.py</a>实现了这一操作。
+实现了两景SAR影像配准后，再来看看如何配准SAR影像与DEM模拟振幅影像。<a href="./coregistration.py">coregistration.py</a>实现了这一操作。
